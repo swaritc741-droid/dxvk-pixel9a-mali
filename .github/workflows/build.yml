@@ -1,4 +1,4 @@
-name: Build DXVK 1.7.2
+name: Build DXVK 1.7.2 Pixel 9a V1
 
 on:
   workflow_dispatch:
@@ -30,6 +30,11 @@ jobs:
           sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
           sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
 
+      - name: Apply Pixel 9a Mali V1 patch
+        run: |
+          sed -i '/\/\/ Default to a chunk size of 128 MiB/{n;s/128 << 20/64 << 20/;}' src/dxvk/dxvk_memory.cpp
+          grep -A2 "Default to a chunk size" src/dxvk/dxvk_memory.cpp
+
       - name: Configure 64-bit build
         run: |
           meson setup \
@@ -38,17 +43,17 @@ jobs:
             --prefix "$GITHUB_WORKSPACE/install" \
             build.w64
 
-      - name: Compile DXVK
+      - name: Compile DXVK V1
         run: |
           ninja -C build.w64
 
-      - name: Install DXVK
+      - name: Install DXVK V1
         run: |
           ninja -C build.w64 install
 
-      - name: Upload DXVK DLLs
+      - name: Upload DXVK V1 DLLs
         uses: actions/upload-artifact@v4
         with:
-          name: DXVK-1.7.2-clean-x64
+          name: DXVK-1.7.2-Pixel9a-Mali-V1-x64
           path: |
             install/bin/*.dll
